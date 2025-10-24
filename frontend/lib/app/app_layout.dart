@@ -37,7 +37,7 @@ class _AppLayoutState extends State<AppLayout> {
     if (isWide) {
       setState(() => _sidebarOpen = !_sidebarOpen); // PC: toggle
     } else {
-      _scaffoldKey.currentState?.openDrawer();      // Phone: open drawer
+      _scaffoldKey.currentState?.openDrawer(); // Phone: open drawer
     }
   }
 
@@ -53,10 +53,12 @@ class _AppLayoutState extends State<AppLayout> {
         onMenuTap: () => _onMenuTap(isWide),
       ),
       // Drawer only on phone
-      drawer: isWide ? null : LeftDrawer(
-        currentIndex: widget.currentIndex,
-        onSelect: (i) => _navigate(i),
-      ),
+      drawer: isWide
+          ? null
+          : LeftDrawer(
+              currentIndex: widget.currentIndex,
+              onSelect: (i) => _navigate(i),
+            ),
       body: Row(
         children: [
           // Inline collapsible sidebar on PC

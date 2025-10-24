@@ -74,7 +74,10 @@ class _Toolbar extends StatelessWidget {
 
         // RIGHT: actions
         if (!isTight) ...[
-          const _IconPill(icon: Icons.speed_rounded, label: 'Free Credit Score'),
+          const _IconPill(
+            icon: Icons.speed_rounded,
+            label: 'Free Credit Score',
+          ),
           const SizedBox(width: 6),
           const _WalletPill(),
           const SizedBox(width: 6),
@@ -115,17 +118,19 @@ class _Logo extends StatelessWidget {
           child: const Center(
             child: Text(
               'V',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ),
         const SizedBox(width: 8),
         Text(
           'Vertex',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );
@@ -145,9 +150,15 @@ class _SearchField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        color: isDark ? const Color(0xFF16181B) : Colors.white, // theme-friendly
+        color: isDark
+            ? const Color(0xFF16181B)
+            : Colors.white, // theme-friendly
         boxShadow: const [
-          BoxShadow(color: Color(0x11000000), blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Color(0x11000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
@@ -228,7 +239,11 @@ class _WalletPill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.account_balance_wallet_outlined, size: 16, color: AppColors.primary),
+          const Icon(
+            Icons.account_balance_wallet_outlined,
+            size: 16,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 6),
           const Text(
             '₹0',
@@ -243,7 +258,10 @@ class _WalletPill extends StatelessWidget {
           Container(
             height: 20,
             width: 20,
-            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
             child: const Icon(Icons.add, size: 14, color: Colors.white),
           ),
         ],
@@ -303,9 +321,7 @@ class _RoundIconButton extends StatelessWidget {
         child: SizedBox(
           height: 36,
           width: 36,
-          child: Center(
-            child: Icon(icon, size: 18, color: AppColors.primary),
-          ),
+          child: Center(child: Icon(icon, size: 18, color: AppColors.primary)),
         ),
       ),
     );

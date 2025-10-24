@@ -2,21 +2,21 @@ import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 
-const client = new MongoClient(process.env.MONGO_URI, {
+const client = new MongoClient(process.env.MONGO_URL, {
   maxPoolSize: 20,
   serverSelectionTimeoutMS: 8000,
 });
-let db;
 
+let _db;
 export async function connectDB() {
-  if (db) return db;
+  if (_db) return _db;
   await client.connect();
-  db = client.db(process.env.DB_NAME);
-  console.log("✅ Mongo connected:", db.databaseName);
-  return db;
-}
+  _db = client.db(process.env.DB_NAME || "vertex_suite");
 
-export function getDB() {
-  if (!db) throw new Error("DB not initialized");
-  return db;
+  // Useful indexes
+  await _db.collection("users").createIndex({ email: 1 }, { unique: true });
+  await _db.collection("tasks").createIndex({ userId: 1, createdAt: -1 });
+
+  return _db;
 }
+export const db = () => _db;
