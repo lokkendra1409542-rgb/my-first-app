@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
 }
 
 class _PhotoStepPlaceholder extends StatelessWidget {
-  const _PhotoStepPlaceholder({super.key});
+  const _PhotoStepPlaceholder();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

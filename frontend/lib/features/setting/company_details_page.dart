@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_app/app/app_layout.dart';
 import 'package:my_first_app/app/app_routes.dart';
+import 'package:my_first_app/features/setting/company_menu.dart';
 
 class CompanyDetailsPage extends StatefulWidget {
   const CompanyDetailsPage({super.key});
@@ -27,10 +28,24 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
     super.dispose();
   }
 
+  void _goMenu(int i) {
+    switch (i) {
+      case 0:
+        // already here
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, "/settings/company/kyc");
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("This section is a placeholder")),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final routeName = ModalRoute.of(context)?.settings.name;
-    final idx = AppRouteMap.indexForPath(routeName);
+    final idx = AppRouteMap.indexForPath(ModalRoute.of(context)?.settings.name);
 
     return AppLayout(
       title: "Company Details",
@@ -42,55 +57,7 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () =>
-                        Navigator.pushReplacementNamed(context, "/settings"),
-                    child: const Text(
-                      "Settings",
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.chevron_right,
-                    size: 18,
-                    color: Colors.black45,
-                  ),
-                  const SizedBox(width: 6),
-                  InkWell(
-                    onTap: () => Navigator.pushReplacementNamed(
-                      context,
-                      "/settings/company",
-                    ),
-                    child: const Text(
-                      "Company Setup",
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.chevron_right,
-                    size: 18,
-                    color: Colors.black45,
-                  ),
-                  const SizedBox(width: 6),
-                  const Text(
-                    "Company Details",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
+              _breadcrumb(context),
               const SizedBox(height: 10),
 
               const Text(
@@ -106,13 +73,19 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
 
               LayoutBuilder(
                 builder: (context, c) {
-                  final isWide = c.maxWidth >= 1000;
+                  final isDesktop = c.maxWidth >= 1000;
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (isWide)
-                        const SizedBox(width: 280, child: _LeftSectionMenu()),
-                      if (isWide) const SizedBox(width: 16),
+                      if (isDesktop) ...[
+                        SizedBox(
+                          width: 280,
+                          child: CompanyMenu(current: 0, onTap: _goMenu),
+                        ),
+                        const SizedBox(width: 16),
+                      ] else
+                        CompanyMenu(current: 0, onTap: _goMenu),
+
                       Expanded(child: _contentCard(context)),
                     ],
                   );
@@ -122,6 +95,46 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
           ),
         ),
       ),
+    );
+  }
+
+  /* ---------------- UI helpers ---------------- */
+
+  Widget _breadcrumb(BuildContext context) {
+    return Row(
+      children: [
+        InkWell(
+          onTap: () => Navigator.pushReplacementNamed(context, "/settings"),
+          child: const Text(
+            "Settings",
+            style: TextStyle(
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        const Icon(Icons.chevron_right, size: 18, color: Colors.black45),
+        const SizedBox(width: 6),
+        InkWell(
+          onTap: () =>
+              Navigator.pushReplacementNamed(context, "/settings/company"),
+          child: const Text(
+            "Company Setup",
+            style: TextStyle(
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        const Icon(Icons.chevron_right, size: 18, color: Colors.black45),
+        const SizedBox(width: 6),
+        const Text(
+          "Company Details",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+        ),
+      ],
     );
   }
 
@@ -312,97 +325,6 @@ class _CompanyDetailsPageState extends State<CompanyDetailsPage> {
         const SizedBox(height: 8),
         child,
       ],
-    );
-  }
-}
-
-class _LeftSectionMenu extends StatelessWidget {
-  const _LeftSectionMenu();
-  @override
-  Widget build(BuildContext context) {
-    final items = const [
-      "Company Details",
-      "Domestic KYC",
-      "Pick Up Address",
-      "Labels",
-      "Billing, Invoice, & GSTIN",
-      "Password & Login Security",
-      "Label Settings",
-    ];
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ListView.separated(
-        itemCount: items.length + 1,
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        separatorBuilder: (_, __) => const SizedBox(height: 2),
-        itemBuilder: (_, i) {
-          if (i == 0) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: const Color(0xFFE8F5E9),
-                    child: Icon(
-                      Icons.apartment_rounded,
-                      color: Colors.green.shade600,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "COMPANY SETUP",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: .6,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          final label = items[i - 1];
-          final selected = (i - 1) == 0;
-          return InkWell(
-            onTap: () {
-              switch (i - 1) {
-                case 0:
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/settings/company/details",
-                  );
-                  break;
-                case 1:
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/settings/company/kyc",
-                  );
-                  break;
-                default:
-                  {}
-              }
-            },
-            child: Container(
-              height: 42,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.centerLeft,
-              color: selected ? Colors.deepPurple.withOpacity(.06) : null,
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }

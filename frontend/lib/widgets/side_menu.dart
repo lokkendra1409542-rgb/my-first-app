@@ -9,14 +9,20 @@ const _pillBg = Color(0x1459B6F3);
 class SideMenu extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelect;
+
   const SideMenu({
     super.key,
     required this.currentIndex,
     required this.onSelect,
   });
 
+  static const _desktopBreakpoint = 1000.0;
+
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isDesktop = width >= _desktopBreakpoint;
+
     return Container(
       width: 248,
       color: _blueDark,
@@ -24,50 +30,53 @@ class SideMenu extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              alignment: Alignment.centerLeft,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [_blueMid, _blueDark],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            // Header/logo: केवल mobile/tablet पर दिखे
+            if (!isDesktop)
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                alignment: Alignment.centerLeft,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [_blueMid, _blueDark],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border(bottom: BorderSide(color: Color(0x3359B6F3))),
                 ),
-                border: Border(bottom: BorderSide(color: Color(0x3359B6F3))),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [_blueLight, _blueMid],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [_blueLight, _blueMid],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          "assets/logo.png",
+                          width: 22,
+                          height: 22,
+                        ),
                       ),
                     ),
-                    child: Center(
-                      child: Image.asset(
-                        "assets/logo.png",
-                        width: 22,
-                        height: 22,
+                    const SizedBox(width: 10),
+                    const Text(
+                      "Vertex",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Vertex",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 6),
@@ -77,7 +86,6 @@ class SideMenu extends StatelessWidget {
                   _item(Icons.support_agent, "Support", 2),
                   _item(Icons.settings, "Settings", 3),
                   const Divider(color: Color(0x3359B6F3)),
-                  _item(Icons.person_outline, "My Profile", 4),
                 ],
               ),
             ),

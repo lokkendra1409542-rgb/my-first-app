@@ -67,7 +67,6 @@ class _HomeShellState extends State<HomeShell> {
           'Orders',
           'Support',
           'Settings',
-          'My Profile',
         ].elementAt(_index),
         onMenuTap: _onMenuTap,
         onSearch: (q) {

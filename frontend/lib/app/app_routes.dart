@@ -7,13 +7,7 @@ class AppRouteMap {
     "/profile",
   ];
 
-  static const titles = [
-    "Dashboard",
-    "Orders",
-    "Support",
-    "Settings",
-    "My Profile",
-  ];
+  static const titles = ["Dashboard", "Orders", "Support", "Settings"];
 
   // subroutes under settings
   static const settingsSubroutes = [
