@@ -51,12 +51,53 @@ class _AppLayoutState extends State<AppLayout> {
       drawer: isWide
           ? null
           : LeftDrawer(currentIndex: widget.currentIndex, onSelect: _navigate),
-      body: Row(
-        children: [
-          if (isWide)
-            SideMenu(currentIndex: widget.currentIndex, onSelect: _navigate),
-          Expanded(child: widget.body),
-        ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE9F2FF), Color(0xFFFDFEFF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (isWide)
+              SideMenu(currentIndex: widget.currentIndex, onSelect: _navigate),
+            Expanded(
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1280),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(26),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 30,
+                              offset: Offset(0, 20),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          borderRadius: BorderRadius.circular(26),
+                          clipBehavior: Clip.antiAlias,
+                          color: Theme.of(context).colorScheme.surface,
+                          child: widget.body,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
