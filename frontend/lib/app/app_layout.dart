@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_app/app/app_routes.dart';
 import 'package:my_first_app/widgets/app_app_bar.dart';
+import 'package:my_first_app/widgets/left_drawer.dart';
 import 'package:my_first_app/widgets/side_menu.dart';
-import 'package:my_first_app/widgets/left_drawer.dart'; // ← add this
 
 class AppLayout extends StatefulWidget {
   final Widget body;
   final int currentIndex;
   final String title;
-  final Future<void> Function()? onAddTask;
   final ValueChanged<String>? onSearch;
+  final Future<void> Function()? onAddTask;
 
   const AppLayout({
     super.key,
     required this.body,
     required this.currentIndex,
     required this.title,
-    this.onAddTask,
     this.onSearch,
+    this.onAddTask,
   });
 
   @override
@@ -26,19 +26,16 @@ class AppLayout extends StatefulWidget {
 
 class _AppLayoutState extends State<AppLayout> {
   static const double _breakpoint = 900;
-  static const double _sidebarWidth = 260;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _sidebarOpen = true;
 
   void _navigate(int i) {
-    final path = AppRouteMap.pathForIndex(i);
-    Navigator.pushReplacementNamed(context, path);
+    Navigator.pushReplacementNamed(context, AppRouteMap.pathForIndex(i));
   }
 
   void _onMenuTap(bool isWide) {
     if (isWide) {
-      setState(() => _sidebarOpen = !_sidebarOpen);
+      // simple layout: wide पर कुछ नहीं करना
     } else {
       _scaffoldKey.currentState?.openDrawer();
     }
@@ -46,44 +43,27 @@ class _AppLayoutState extends State<AppLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final isWide = w >= _breakpoint;
+    final isWide = MediaQuery.of(context).size.width >= _breakpoint;
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppAppBar(
         title: widget.title,
         onMenuTap: () => _onMenuTap(isWide),
-        onAddTask: widget.onAddTask, // remove if AppAppBar doesn’t support
-        onSearch: widget.onSearch, // remove if AppAppBar doesn’t support
+        onSearch: widget.onSearch,
+        onAddTask: widget.onAddTask,
       ),
+
+      // Mobile/Tablet: Drawer
       drawer: isWide
           ? null
-          : LeftDrawer(
-              // ← now recognized
-              currentIndex: widget.currentIndex,
-              onSelect: _navigate,
-            ),
+          : LeftDrawer(currentIndex: widget.currentIndex, onSelect: _navigate),
+
+      // Desktop/Web: Fixed sidebar + content
       body: Row(
         children: [
           if (isWide)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              width: _sidebarOpen ? _sidebarWidth : 0,
-              child: _sidebarOpen
-                  ? Material(
-                      elevation: 1,
-                      child: SafeArea(
-                        child: SideMenu(
-                          currentIndex: widget.currentIndex,
-                          onSelect: _navigate,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          if (isWide && _sidebarOpen) const VerticalDivider(width: 1),
+            SideMenu(currentIndex: widget.currentIndex, onSelect: _navigate),
           Expanded(child: widget.body),
         ],
       ),

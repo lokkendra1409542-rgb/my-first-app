@@ -26,8 +26,5 @@ class AppRouteMap {
     return paths[i];
   }
 
-  static String titleForPath(String? p) {
-    final i = indexForPath(p);
-    return titles[i];
-  }
+  static String titleForIndex(int i) => titles[indexForPath(paths[i])];
 }

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_first_app/theme/app_colors.dart';
 import 'package:my_first_app/core/auth_store.dart';
+
+/// ===== Vertex Blue/Cyan AppBar (matches logo) =====
+/// Colors pulled from the given logo (approx):
+const _blueDark = Color(0xFF0D4E81); // deep blue edge
+const _blueMid = Color(0xFF1876C1); // primary mid blue
+const _blueLight = Color(0xFF59B6F3); // light cyan/blue highlight
+const _chipBg = Color(0x1A59B6F3); // translucent light blue
+const _dividerC = Color(0x3359B6F3);
 
 class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -18,166 +25,198 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(72);
+  Size get preferredSize => const Size.fromHeight(70);
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF101113) : Colors.white;
+    final isNarrow = MediaQuery.of(context).size.width < 900;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: SystemUiOverlayStyle.light,
       child: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: bg,
         elevation: 0,
-        toolbarHeight: 72,
+        toolbarHeight: 70,
+        backgroundColor: _blueMid,
         surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            color: bg,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [_blueLight, _blueMid, _blueDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.25 : 0.06),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                color: Color(0x33000000),
+                blurRadius: 12,
+                offset: Offset(0, 6),
               ),
             ],
           ),
         ),
-        title: _Toolbar(
-          onMenuTap: onMenuTap,
-          onSearch: onSearch,
-          onAddTask: onAddTask,
+        titleSpacing: 8,
+        title: Row(
+          children: [
+            if (isNarrow)
+              IconButton(
+                tooltip: 'Menu',
+                onPressed: onMenuTap,
+                icon: const Icon(Icons.menu_rounded, color: Colors.white),
+              ),
+            const _LogoMark(),
+            const SizedBox(width: 10),
+            if (!isNarrow)
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: .2,
+                ),
+              ),
+            const SizedBox(width: 14),
+            Expanded(child: _SearchField(onSearch: onSearch)),
+          ],
         ),
         actions: [
-          // 👇 Logout
+          if (onAddTask != null)
+            Container(
+              height: 40,
+              margin: const EdgeInsets.only(right: 6),
+              decoration: BoxDecoration(
+                color: _chipBg,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: _dividerC),
+              ),
+              child: TextButton.icon(
+                onPressed: () => onAddTask!.call(),
+                icon: const Icon(Icons.add_task_rounded, color: Colors.white),
+                label: const Text(
+                  "Add Task",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             tooltip: "Logout",
-            icon: const Icon(Icons.logout_rounded),
             onPressed: () async {
               await AuthStore.clear();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, "/");
-              }
+              // ignore: use_build_context_synchronously
+              Navigator.pushNamedAndRemoveUntil(context, "/", (r) => false);
             },
+            icon: const Icon(Icons.logout_rounded, color: Colors.white),
           ),
+          const SizedBox(width: 4),
         ],
       ),
     );
   }
 }
 
-class _Toolbar extends StatelessWidget {
-  final VoidCallback onMenuTap;
-  final ValueChanged<String>? onSearch;
-  final Future<void> Function()? onAddTask;
-  const _Toolbar({required this.onMenuTap, this.onSearch, this.onAddTask});
+class _LogoMark extends StatelessWidget {
+  const _LogoMark();
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final isTight = w < 900;
-
     return Row(
       children: [
-        if (isTight)
-          IconButton(
-            onPressed: onMenuTap,
-            icon: const Icon(Icons.menu),
-            tooltip: 'Menu',
+        // circular logo chip
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [_blueLight, _blueMid],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        const _Logo(),
-        SizedBox(width: isTight ? 12 : 28),
-        Expanded(child: _SearchField(onSearch: onSearch)),
-        SizedBox(width: isTight ? 8 : 12),
-        if (!isTight && onAddTask != null)
-          FilledButton.icon(
-            onPressed: () => onAddTask!.call(),
-            icon: const Icon(Icons.add_task_rounded, size: 18),
-            label: const Text('Add Task'),
+          child: Center(
+            child: Image.asset(
+              "assets/logo.png",
+              width: 22,
+              height: 22,
+              fit: BoxFit.contain,
+            ),
           ),
+        ),
+        const SizedBox(width: 8),
+        const Text(
+          "Vertex",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            letterSpacing: .2,
+          ),
+        ),
       ],
     );
   }
 }
 
-class _Logo extends StatelessWidget {
-  const _Logo();
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Container(
-        height: 36,
-        width: 36,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.primaryDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: const Center(
-          child: Text(
-            'V',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-          ),
-        ),
-      ),
-      const SizedBox(width: 8),
-      Text(
-        'Vertex',
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-      ),
-    ],
-  );
-}
-
-class _SearchField extends StatelessWidget {
+class _SearchField extends StatefulWidget {
   final ValueChanged<String>? onSearch;
   const _SearchField({this.onSearch});
 
   @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  final _c = TextEditingController();
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: isDark ? const Color(0xFF16181B) : Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x11000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
+        color: const Color(0x1AFFFFFF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _dividerC),
       ),
       child: Row(
         children: [
-          const SizedBox(width: 8),
-          Icon(Icons.search_rounded, color: Colors.grey.shade600),
+          const Icon(Icons.search_rounded, color: Colors.white, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
+              controller: _c,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
               textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                hintText: "Search tasks...",
-                hintStyle: TextStyle(color: Colors.grey.shade500),
+              decoration: const InputDecoration(
+                hintText: "Search…",
+                hintStyle: TextStyle(color: Colors.white70),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
-              onSubmitted: (v) => onSearch?.call(v.trim()),
+              onSubmitted: (v) => widget.onSearch?.call(v.trim()),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.clear_rounded, size: 18),
-            onPressed: () => onSearch?.call(""),
+            tooltip: _c.text.isEmpty ? "Filters" : "Clear",
+            onPressed: () {
+              if (_c.text.isEmpty) return;
+              _c.clear();
+              widget.onSearch?.call("");
+              setState(() {});
+            },
+            icon: Icon(
+              _c.text.isEmpty ? Icons.tune_rounded : Icons.close_rounded,
+              size: 18,
+              color: Colors.white70,
+            ),
           ),
         ],
       ),
