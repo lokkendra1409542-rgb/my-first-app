@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_first_app/core/auth_store.dart';
 
-/// ===== Vertex Blue/Cyan AppBar (matches logo) =====
-/// Colors pulled from the given logo (approx):
-const _blueDark = Color(0xFF0D4E81); // deep blue edge
-const _blueMid = Color(0xFF1876C1); // primary mid blue
-const _blueLight = Color(0xFF59B6F3); // light cyan/blue highlight
-const _chipBg = Color(0x1A59B6F3); // translucent light blue
+const _blueDark = Color(0xFF0D4E81);
+const _blueMid = Color(0xFF1876C1);
+const _blueLight = Color(0xFF59B6F3);
+const _chipBg = Color(0x1A59B6F3);
 const _dividerC = Color(0x3359B6F3);
 
 class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback onMenuTap;
-  final ValueChanged<String>? onSearch;
-  final Future<void> Function()? onAddTask;
+  final ValueChanged<String>? onSearch; // desktop/tablet only
+  final Future<void> Function()? onAddTask; // optional
 
   const AppAppBar({
     super.key,
@@ -35,9 +33,9 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
       value: SystemUiOverlayStyle.light,
       child: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: _blueMid,
         elevation: 0,
         toolbarHeight: 70,
-        backgroundColor: _blueMid,
         surfaceTintColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -46,13 +44,6 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 12,
-                offset: Offset(0, 6),
-              ),
-            ],
           ),
         ),
         titleSpacing: 8,
@@ -60,7 +51,6 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             if (isNarrow)
               IconButton(
-                tooltip: 'Menu',
                 onPressed: onMenuTap,
                 icon: const Icon(Icons.menu_rounded, color: Colors.white),
               ),
@@ -72,11 +62,13 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: .2,
                 ),
               ),
-            const SizedBox(width: 14),
-            Expanded(child: _SearchField(onSearch: onSearch)),
+            if (!isNarrow) ...[
+              const SizedBox(width: 14),
+              Expanded(child: _SearchField(onSearch: onSearch)),
+            ] else
+              const Spacer(),
           ],
         ),
         actions: [
@@ -104,9 +96,19 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             tooltip: "Logout",
             onPressed: () async {
-              await AuthStore.clear();
-              // ignore: use_build_context_synchronously
-              Navigator.pushNamedAndRemoveUntil(context, "/", (r) => false);
+              try {
+                await AuthStore.clear();
+                if (!context.mounted) return;
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamedAndRemoveUntil('/', (route) => false);
+              } catch (e) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
+              }
             },
             icon: const Icon(Icons.logout_rounded, color: Colors.white),
           ),
@@ -119,12 +121,10 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class _LogoMark extends StatelessWidget {
   const _LogoMark();
-
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // circular logo chip
         Container(
           width: 36,
           height: 36,
@@ -137,32 +137,23 @@ class _LogoMark extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Image.asset(
-              "assets/logo.png",
-              width: 22,
-              height: 22,
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset("assets/logo.png", width: 22, height: 22),
           ),
         ),
         const SizedBox(width: 8),
         const Text(
           "Vertex",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-            letterSpacing: .2,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
       ],
     );
   }
 }
 
+/* ---------- desktop/tablet search ---------- */
 class _SearchField extends StatefulWidget {
   final ValueChanged<String>? onSearch;
   const _SearchField({this.onSearch});
-
   @override
   State<_SearchField> createState() => _SearchFieldState();
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Theme (same as AppBar logo palette)
 const _blueDark = Color(0xFF0D4E81);
 const _blueMid = Color(0xFF1876C1);
 const _blueLight = Color(0xFF59B6F3);
@@ -10,7 +9,6 @@ const _pillBg = Color(0x1459B6F3);
 class SideMenu extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelect;
-
   const SideMenu({
     super.key,
     required this.currentIndex,
@@ -26,7 +24,6 @@ class SideMenu extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            // Top strip with logo
             Container(
               height: 60,
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -66,14 +63,11 @@ class SideMenu extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: .2,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Menu items
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 6),

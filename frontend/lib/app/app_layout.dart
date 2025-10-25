@@ -26,7 +26,6 @@ class AppLayout extends StatefulWidget {
 
 class _AppLayoutState extends State<AppLayout> {
   static const double _breakpoint = 900;
-
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _navigate(int i) {
@@ -34,11 +33,7 @@ class _AppLayoutState extends State<AppLayout> {
   }
 
   void _onMenuTap(bool isWide) {
-    if (isWide) {
-      // simple layout: wide पर कुछ नहीं करना
-    } else {
-      _scaffoldKey.currentState?.openDrawer();
-    }
+    if (!isWide) _scaffoldKey.currentState?.openDrawer();
   }
 
   @override
@@ -53,13 +48,9 @@ class _AppLayoutState extends State<AppLayout> {
         onSearch: widget.onSearch,
         onAddTask: widget.onAddTask,
       ),
-
-      // Mobile/Tablet: Drawer
       drawer: isWide
           ? null
           : LeftDrawer(currentIndex: widget.currentIndex, onSelect: _navigate),
-
-      // Desktop/Web: Fixed sidebar + content
       body: Row(
         children: [
           if (isWide)

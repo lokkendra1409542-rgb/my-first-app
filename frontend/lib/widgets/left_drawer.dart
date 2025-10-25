@@ -17,7 +17,7 @@ class LeftDrawer extends StatelessWidget {
       child: SideMenu(
         currentIndex: currentIndex,
         onSelect: (i) {
-          Navigator.pop(context); // close drawer
+          Navigator.pop(context);
           onSelect(i);
         },
       ),

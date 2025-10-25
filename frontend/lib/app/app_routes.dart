@@ -15,16 +15,24 @@ class AppRouteMap {
     "My Profile",
   ];
 
+  // subroutes under settings
+  static const settingsSubroutes = [
+    "/settings/company",
+    "/settings/company/details",
+    "/settings/company/kyc",
+    "/settings/company/kyc/photo",
+  ];
+
   static int indexForPath(String? p) {
     final path = p ?? "/dashboard";
     final i = paths.indexOf(path);
-    return i >= 0 ? i : 0;
+    if (i >= 0) return i;
+    if (path.startsWith("/settings")) return 3; // keep Settings highlighted
+    return 0;
   }
 
   static String pathForIndex(int i) {
     if (i < 0 || i >= paths.length) return "/dashboard";
     return paths[i];
   }
-
-  static String titleForIndex(int i) => titles[indexForPath(paths[i])];
 }
