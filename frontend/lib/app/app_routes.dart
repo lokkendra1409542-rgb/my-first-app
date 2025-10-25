@@ -1,34 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:my_first_app/features/dashboard/dashboard_page.dart';
-import 'package:my_first_app/features/order/order_page.dart';
-import 'package:my_first_app/features/support/support_page.dart';
-import 'package:my_first_app/features/setting/setting_page.dart';
-
-/// 4 working routes only: Dashboard(0), Orders(1), Support(2), Settings(3)
 class AppRouteMap {
-  static const dashboard = '/';
-  static const orders    = '/orders';
-  static const support   = '/support';
-  static const settings  = '/settings';
+  static const paths = [
+    "/dashboard",
+    "/orders",
+    "/support",
+    "/settings",
+    "/profile",
+  ];
 
-  static const titles = <String>['Dashboard', 'Orders', 'Support', 'Settings'];
+  static const titles = [
+    "Dashboard",
+    "Orders",
+    "Support",
+    "Settings",
+    "My Profile",
+  ];
 
-  static String pathForIndex(int i) => [dashboard, orders, support, settings][i];
+  static int indexForPath(String? p) {
+    final path = p ?? "/dashboard";
+    final i = paths.indexOf(path);
+    return i >= 0 ? i : 0;
+  }
 
-  static int indexForPath(String? path) {
-    switch (path) {
-      case orders:   return 1;
-      case support:  return 2;
-      case settings: return 3;
-      case dashboard:
-      default:       return 0;
-    }
+  static String pathForIndex(int i) {
+    if (i < 0 || i >= paths.length) return "/dashboard";
+    return paths[i];
+  }
+
+  static String titleForPath(String? p) {
+    final i = indexForPath(p);
+    return titles[i];
   }
 }
-
-Map<String, WidgetBuilder> appRoutes() => {
-  AppRouteMap.dashboard: (_) => const DashboardPage(),
-  AppRouteMap.orders:    (_) => const OrdersPage(),
-  AppRouteMap.support:   (_) => const SupportPage(),
-  AppRouteMap.settings:  (_) => const SettingsPage(),
-};

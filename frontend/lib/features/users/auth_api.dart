@@ -1,33 +1,68 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_first_app/core/api.dart';
 
 class AuthApi {
-  final base = "${ApiConfig.baseUrl}/api/auth";
+  final String base = "${ApiConfig.baseUrl}/api/auth";
 
+  /// Sign up → returns JWT token
   Future<String> signup(String name, String email, String password) async {
-    final r = await http.post(
-      Uri.parse("$base/signup"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"name": name, "email": email, "password": password}),
-    );
-    if (r.statusCode != 200) {
-      throw Exception(jsonDecode(r.body)['error'] ?? "Signup failed");
+    final uri = Uri.parse("$base/signup");
+    final res = await http
+        .post(
+          uri,
+          headers: const {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "name": name,
+            "email": email,
+            "password": password,
+          }),
+        )
+        .timeout(const Duration(seconds: 12));
+
+    if (res.statusCode != 200) {
+      try {
+        final body = jsonDecode(res.body);
+        throw Exception(body['error'] ?? "Signup failed (${res.statusCode})");
+      } catch (_) {
+        throw Exception("Signup failed (${res.statusCode})");
+      }
     }
-    final body = jsonDecode(r.body);
-    return body['token'];
+
+    final body = jsonDecode(res.body);
+    final token = body['token'];
+    if (token == null || token is! String) {
+      throw Exception("Invalid signup response: token missing");
+    }
+    return token;
   }
 
+  /// Login → returns JWT token
   Future<String> login(String email, String password) async {
-    final r = await http.post(
-      Uri.parse("$base/login"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "password": password}),
-    );
-    if (r.statusCode != 200) {
-      throw Exception(jsonDecode(r.body)['error'] ?? "Login failed");
+    final uri = Uri.parse("$base/login");
+    final res = await http
+        .post(
+          uri,
+          headers: const {"Content-Type": "application/json"},
+          body: jsonEncode({"email": email, "password": password}),
+        )
+        .timeout(const Duration(seconds: 12));
+
+    if (res.statusCode != 200) {
+      try {
+        final body = jsonDecode(res.body);
+        throw Exception(body['error'] ?? "Login failed (${res.statusCode})");
+      } catch (_) {
+        throw Exception("Login failed (${res.statusCode})");
+      }
     }
-    final body = jsonDecode(r.body);
-    return body['token'];
+
+    final body = jsonDecode(res.body);
+    final token = body['token'];
+    if (token == null || token is! String) {
+      throw Exception("Invalid login response: token missing");
+    }
+    return token;
   }
 }
